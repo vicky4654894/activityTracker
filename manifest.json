@@ -1,0 +1,25 @@
+{
+    "name": "Web Activity Tracker",
+    "version": "0.0.1",
+    "description": "Tracks the time and domain name of the active tab",
+    "manifest_version": 3,
+    "permissions": [
+      "activeTab",
+      "storage",
+      "tabs"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_title": "Web Activity Tracker"
+    }
+  }
+  

@@ -1,0 +1,30 @@
+/* popup.css */
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 20px;
+  width: 500px;
+  background-color: aliceblue;
+  text-align: center;
+}
+
+#activityList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  border: 2px solid black;
+  border-radius: 5px;
+}
+
+#activityList li {
+  margin-bottom: 10px;
+  font-size: 20px; /* Adjust the font size as needed */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#currentTime {
+  margin-top: 20px;
+  font-weight: bold;
+}
