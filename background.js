@@ -1,10 +1,8 @@
 let activeTabId;
 let startTime = 0;
 
-// Refresh interval in milliseconds
 const refreshInterval = 1000;
 
-// Set up interval to periodically update time
 setInterval(updateElapsedTime, refreshInterval);
 
 function updateElapsedTime() {
@@ -12,28 +10,23 @@ function updateElapsedTime() {
     const currentTime = new Date().getTime();
     const elapsedTime = currentTime - startTime;
 
-    // Use chrome.tabs.get to get URL from the active tab
     chrome.tabs.get(activeTabId, function (tab) {
       if (tab && tab.url !== undefined) {
         const domain = extractDomain(tab.url);
 
-        // Update the stored data in local storage
         chrome.storage.local.get({ "data": [] }, function (result) {
           const storedData = result.data || [];
           const index = storedData.findIndex(entry => entry.domain === domain);
 
           if (index !== -1) {
-            // If domain entry exists, update the time
+            
             storedData[index].time += elapsedTime;
           } else {
-            // If domain entry does not exist, create a new entry
             storedData.push({ domain, time: elapsedTime });
           }
 
-          // Save the updated data to local storage
           chrome.storage.local.set({ "data": storedData });
 
-          // Reset start time for the active tab
           startTime = currentTime;
 
           console.log(`Domain: ${domain}, Time: ${formatTime(elapsedTime)}`);
