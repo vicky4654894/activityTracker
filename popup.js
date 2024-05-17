@@ -1,5 +1,13 @@
 let data;
+document.getElementById('pauseButton').addEventListener('click', function () {
+  chrome.runtime.sendMessage({ action: 'pause' });
+});
 
+document.getElementById('resumeButton').addEventListener('click', function () {
+  chrome.runtime.sendMessage({ action: 'resume' });
+});
+
+// Open a popup window with specified width and height
 document.addEventListener('DOMContentLoaded', function () {
   const port = chrome.runtime.connect({ name: 'popup' });
 
@@ -13,8 +21,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function refreshData() {
+  chrome.runtime.sendMessage({action:localStorage.getItem("websiteBlocker")});
   chrome.storage.local.get({ "data": [] }, function (result) {
     const storedData = result.data;
+    
     drawPieChartFromArray(storedData);
     const activityList = document.getElementById('activityList');
 
@@ -30,11 +40,12 @@ function refreshData() {
         entry.domain="chrome";
       }
       listItem.textContent = `Domain: ${entry.domain}, Time: ${formatTime(entry.time)}`;
+     
       colorbox.style.backgroundColor=entry.color;
       colorbox.textContent =`${entry.color}`
       listItem.style.backgroundColor=entry.color;
       activityList.appendChild(listItem);
-     // activityList.append(colorbox);
+      
     });
 
     // Generate data for pie chart
@@ -52,43 +63,9 @@ function refreshData() {
   });
 }
 
-// function refreshData() {
-//   chrome.storage.local.get({ "data": [] }, function (result) {
-//     const storedData = result.data;
-//     drawPieChartFromArray(storedData);
-//     const activityTable = document.getElementById('activityTable');
-
-//     // Clear the table body
-//     activityTable.innerHTML = '';
-
-//     storedData.forEach(entry => {
-//       const row = activityTable.insertRow(); // Create a new row
-
-//       // Create cell for domain
-//       const domainCell = row.insertCell();
-//       domainCell.textContent = entry.domain || "chrome";
-//       domainCell.classList.add('domain-cell'); // Add class name
-
-//       // Create cell for time
-//       const timeCell = row.insertCell();
-//       timeCell.textContent = formatTime(entry.time);
-//       timeCell.classList.add('time-cell'); // Add class name
-
-//       // Create cell for color box
-//       const colorCell = row.insertCell();
-//       const colorBox = document.createElement('span');
-//       colorBox.style.width = "20px";
-//       colorBox.style.height = "20px";
-//       colorBox.style.backgroundColor = entry.color;
-//       colorBox.classList.add('color-box'); // Add class name
-//       colorCell.appendChild(colorBox);
-//     });
-//   });
-// }
-
-
 
 function formatTime(milliseconds) {
+ 
   const seconds = Math.floor(milliseconds / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -109,8 +86,7 @@ function getCurrentTime() {
 }
 
 function drawPieChartFromArray(data) {
-  console.log("draw pie Chart");
-  console.log(data);
+  // console.log("Data = ",data);
   const canvas = document.getElementById('myPieChart');
   const ctx = canvas.getContext('2d');
 
@@ -132,17 +108,56 @@ function drawPieChartFromArray(data) {
 
     // Update the starting angle for the next slice
     startAngle += sliceAngle;
+
   }
 }
 
-// Example data in the array format
-const sampleDataArray = [
-  { color: '#718D0E', domain: 'www.youtube.com', time: 701675 },
-  { color: '#A3A7E7', domain: null, time: 342874 },
-  { color: '#2B55F4', domain: 'chat.openai.com', time: 101561 }
-];
+document.getElementById('timeLimitForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const websiteUrl = document.getElementById('websiteUrl').value;
+  const timeLimit = parseInt(document.getElementById('timeLimit').value);
+  let websiteData = JSON.parse(localStorage.getItem("websiteBlocker"));
 
+  // Ensure that websiteData is an array
+  if (websiteData===null) {
+    websiteData = [];
+  }
+  websiteData.push({ url: websiteUrl, time: timeLimit });
+  localStorage.setItem("websiteBlocker", JSON.stringify(websiteData));
+  displayWebsiteBlocker();
+});
 
+function displayWebsiteBlocker(){
+  const submittedList = document.querySelector('.submittedList');
+  submittedList.innerHTML = ''; // Clear previous content
+  
+  // Retrieve website blocker data from local storage
+  const websiteData = JSON.parse(localStorage.getItem("websiteBlocker")) || [];
 
+  // Iterate over the websiteData and create list items to display each entry
+  websiteData.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.setAttribute( 'class', 'd-flex justify-content-between p-1' );
+    li.textContent = `URL: ${item.url}, Time Limit: ${item.time} minutes`;
+    
+    // Create delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.setAttribute('class','btn btn-warning')
+    deleteButton.addEventListener('click', () => {
+      // Remove item from websiteData array
+      websiteData.splice(index, 1);
+      // Update local storage
+      
+      localStorage.setItem('websiteBlocker', JSON.stringify(websiteData));
+      displayWebsiteBlocker();
+    });
 
+    // Append delete button to list item
+    li.appendChild(deleteButton);
+    // Append list item to UL
+    submittedList.appendChild(li);
+  });
+}
 
+displayWebsiteBlocker();

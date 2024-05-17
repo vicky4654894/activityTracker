@@ -1,44 +1,95 @@
+let isTrackingPaused = false;
 let activeTabId;
 let startTime = 0;
+let pausedTime = 0;
+let websiteBlocker = null;
+const generatedColors = new Set();
 
-const refreshInterval = 1000;
+setInterval(updateElapsedTime, 1000);
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.action === 'pause') {
+    isTrackingPaused = true;
+  } else if (message.action === 'resume') {
+    isTrackingPaused = false;
+  } else {
+    websiteBlocker = message.action;
+  }
+});
+
+
+function extractDomain(url) {
+  const match = url.match(/^https?\:\/\/(?:www\.)?([^\/?#]+)(?:[\/?#]|$)/i);
+  let domain = match && match[1];
+  if (domain && domain.endsWith('.com')) {
+    domain = domain.slice(0, -4);
+  }
+  return domain;
+}
 
 function getRandomColor() {
   const letters = '0123456789ABCDEF';
   let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
+
+  do {
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+  } while (generatedColors.has(color));
+
+  generatedColors.add(color);
+
   return color;
 }
 
-setInterval(updateElapsedTime, refreshInterval);
+function websiteBlockerFunction() {
+  console.log("Function is called");
+  chrome.tabs.update(activeTabId, { url: chrome.runtime.getURL('block.html') });
+}
+
+function pad(number) {
+  return (number < 10 ? '0' : '') + number;
+}
 
 function updateElapsedTime() {
-  if (activeTabId !== undefined) {
-    const currentTime = new Date().getTime();
-    const elapsedTime = currentTime - startTime;
+  if (!isTrackingPaused && activeTabId !== undefined) {
+    let elapsedTime;
+    elapsedTime=1000;
     chrome.tabs.get(activeTabId, function (tab) {
       if (tab && tab.url !== undefined) {
         const domain = extractDomain(tab.url);
-
         chrome.storage.local.get({ "data": [] }, function (result) {
           const storedData = result.data || [];
           const index = storedData.findIndex(entry => entry.domain === domain);
 
           if (index !== -1) {
             storedData[index].time += elapsedTime;
+            let remainderWebsite = JSON.parse(websiteBlocker);
+            let blockDomainName = "";
+            let blockDomainTime = null;
+            let time = storedData[index].time / 1000;
+
+            if (remainderWebsite) {
+              remainderWebsite.forEach((item) => {
+                if (item.url === domain) {
+                  blockDomainName = item.url;
+                  blockDomainTime = item.time * 60;
+                }
+              });
+            }
+
+            if (blockDomainName === domain && blockDomainTime <= time) {
+              websiteBlockerFunction();
+            }
           } else {
-            // console.log("First Time");
             let color = getRandomColor();
-            storedData.push({ domain, time: elapsedTime,color });
+            if (domain != null) {
+              storedData.push({ domain, time: elapsedTime, color });
+            }
           }
-          console.log(storedData);
+
           chrome.storage.local.set({ "data": storedData });
-
-          startTime = currentTime;
-
-        //  console.log(`Domain: ${domain}, Time: ${formatTime(elapsedTime)}`);
+         
         });
       } else {
         console.log("Error: Tab information or URL not available");
@@ -48,35 +99,14 @@ function updateElapsedTime() {
 }
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
-  updateElapsedTime(); 
   activeTabId = activeInfo.tabId;
-  startTime = new Date().getTime();
+  updateElapsedTime();
 });
-
 chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
   if (tabId === activeTabId) {
-    updateElapsedTime(); 
+    updateElapsedTime();
   }
 });
-
-
 chrome.runtime.onSuspend.addListener(function () {
   updateElapsedTime();
 });
-
-function extractDomain(url) {
-  const match = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
-  return match && match[1];
-}
-
-function formatTime(milliseconds) {
-  const seconds = Math.floor(milliseconds / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-
-  return `${pad(hours)}:${pad(minutes % 60)}:${pad(seconds % 60)}`;
-}
-
-function pad(number) {
-  return (number < 10 ? '0' : '') + number;
-}

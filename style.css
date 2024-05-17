@@ -1,39 +1,57 @@
 /* popup.css */
-*{
-  /* box-sizing: border-box; */
-  margin: 0;
+/* *{/* popup.css */
+
+/* Apply box-sizing to all elements */
+* {
+  box-sizing: border-box;
+  margin: auto;
   padding: 0;
-}
-body {
-  font-family: 'Arial', sans-serif;
-  margin: 20px;
-  width: 700px;
-  background-color: aliceblue;
   text-align: center;
 }
 
+/* Apply a global font-family */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 20px auto; /* Center the content horizontally */
+  width: 800px;
+  background-color: #f2f2f2; /* Use a lighter background color */
+}
+
+/* Style the activity list */
 #activityList {
   list-style: none;
   padding: 0;
   margin: 10px 0;
-  border: 2px solid black;
+  border: 2px solid #333; /* Darken the border color */
   border-radius: 5px;
+
 }
 
-
+/* Style each activity item */
 #activityList li {
-  margin: 1.0em;
-  font-size: 20px; 
+  margin: 5px;
+  font-size: 15px; /* Reduce the font size slightly */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 2px solid rgb(31, 30, 30);
-  text-align: center;
+  border: 2px solid #e1d6d6; /* Darken the border color */
   padding: 10px;
+  background-color: #fff; /* Add a white background */
 }
 
+
+/* Style the current time display */
 #currentTime {
   margin-top: 20px;
   font-weight: bold;
 }
 
+.blockList{
+  background-color: aqua;
+  font-size: 15px;
+  list-style: none;
+  margin: 2px;
+  padding: 5px;
+  display: flex;
+  text-align: center;
+}
