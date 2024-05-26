@@ -1,44 +1,9 @@
-/* popup.css */
-/* *{/* popup.css */
-
 /* Apply box-sizing to all elements */
 * {
   box-sizing: border-box;
-  margin: auto;
-  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
 }
-
-/* Apply a global font-family */
-body {
-  font-family: 'Arial', sans-serif;
-  margin: 20px auto; /* Center the content horizontally */
-  width: 800px;
-  background-color: #f2f2f2; /* Use a lighter background color */
-}
-
-/* Style the activity list */
-#activityList {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0;
-  border: 2px solid #333; /* Darken the border color */
-  border-radius: 5px;
-
-}
-
-/* Style each activity item */
-#activityList li {
-  margin: 5px;
-  font-size: 15px; /* Reduce the font size slightly */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 2px solid #e1d6d6; /* Darken the border color */
-  padding: 10px;
-  background-color: #fff; /* Add a white background */
-}
-
 
 /* Style the current time display */
 #currentTime {
@@ -46,12 +11,36 @@ body {
   font-weight: bold;
 }
 
-.blockList{
+/* Style the activity list */
+#activityList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  border: 2px solid #333;
+  border-radius: 5px;
+}
+
+/* Style each activity item */
+#activityList li {
+  margin: 5px;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid #e1d6d6;
+  padding: 10px;
+  background-color: #fff;
+  text-align: center;
+}
+
+/* Style for block list items */
+.blockList {
   background-color: aqua;
   font-size: 15px;
   list-style: none;
   margin: 2px;
   padding: 5px;
   display: flex;
-  text-align: center;
+  justify-content: center;
+  align-items: center;
 }

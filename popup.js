@@ -1,4 +1,3 @@
-let data;
 document.getElementById('pauseButton').addEventListener('click', function () {
   chrome.runtime.sendMessage({ action: 'pause' });
 });
@@ -7,49 +6,51 @@ document.getElementById('resumeButton').addEventListener('click', function () {
   chrome.runtime.sendMessage({ action: 'resume' });
 });
 
-// Open a popup window with specified width and height
-document.addEventListener('DOMContentLoaded', function () {
-  const port = chrome.runtime.connect({ name: 'popup' });
+function formatDate() {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const currentDate = new Date();
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  const month = months[currentDate.getMonth()];
+  const year = currentDate.getFullYear();
+  return `${day}-${month}-${year}`;
+}
 
-  refreshData();
-
-  const intervalId = setInterval(refreshData, 1000);
-  window.addEventListener('beforeunload', function () {
-    clearInterval(intervalId);
-    port.postMessage({ action: 'popupClosed' });
-  });
-});
+function storageHelper(data) {
+  let dateKey = `data ${formatDate()}`;
+  if(data){
+    localStorage.setItem(dateKey, JSON.stringify(data));
+  }
+}
 
 function refreshData() {
-  chrome.runtime.sendMessage({action:localStorage.getItem("websiteBlocker")});
-  chrome.storage.local.get({ "data": [] }, function (result) {
-    const storedData = result.data;
-    
-    drawPieChartFromArray(storedData);
+  chrome.runtime.sendMessage({ action: localStorage.getItem("websiteBlocker") });
+  let dateKey = `data ${formatDate()}`;
+  chrome.storage.local.get({ [dateKey]: [] }, function (result) {
+    const storedData = result[dateKey];
     const activityList = document.getElementById('activityList');
-
     activityList.innerHTML = '';
-
+    totalTime = 0; // Reset total time
     storedData.forEach(entry => {
-      const listItem = document.createElement('li'); 
+      const listItem = document.createElement('li');
       const colorbox = document.createElement('span');
-      colorbox.style.width="20px";
-      colorbox.style.height="20px";
+      colorbox.style.width = "20px";
+      colorbox.style.height = "20px";
+      listItem.style.color="black";
 
-      if(entry.domain == null){
-        entry.domain="chrome";
+      if (entry.domain == null) {
+        entry.domain = "chrome";
       }
       listItem.textContent = `Domain: ${entry.domain}, Time: ${formatTime(entry.time)}`;
-     
-      colorbox.style.backgroundColor=entry.color;
-      colorbox.textContent =`${entry.color}`
-      listItem.style.backgroundColor=entry.color;
+      console.log(entry.time);
+
+      colorbox.style.backgroundColor = entry.color;
+      colorbox.textContent = `${entry.color}`;
+      listItem.style.backgroundColor = entry.color;
       activityList.appendChild(listItem);
-      
+      totalTime += entry.time; // Accumulate total time
     });
 
-    // Generate data for pie chart
-    const domainData = {}; // Object to store domain data for the chart
+    const domainData = {};
     storedData.forEach(entry => {
       if (entry.domain in domainData) {
         domainData[entry.domain] += entry.time;
@@ -60,12 +61,15 @@ function refreshData() {
 
     const currentTimeElement = document.getElementById('currentTime');
     currentTimeElement.textContent = `Current Time: ${getCurrentTime()}`;
+
+    const totalTimeElement = document.getElementById('timeSpent');
+    totalTimeElement.textContent = `Total Time Spent: ${formatTime(totalTime)}`; // Display total time
+    localStorage.setItem("totalTime "+formatDate(),totalTime);
+    storageHelper(storedData);
   });
 }
 
-
 function formatTime(milliseconds) {
- 
   const seconds = Math.floor(milliseconds / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -76,6 +80,7 @@ function formatTime(milliseconds) {
 function pad(number) {
   return (number < 10 ? '0' : '') + number;
 }
+
 function getCurrentTime() {
   const now = new Date();
   const hours = now.getHours();
@@ -85,41 +90,13 @@ function getCurrentTime() {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
-function drawPieChartFromArray(data) {
-  // console.log("Data = ",data);
-  const canvas = document.getElementById('myPieChart');
-  const ctx = canvas.getContext('2d');
-
-  // Calculate the total time for all domains
-  const total = data.reduce((acc, obj) => acc + obj.time, 0);
-
-  // Initialize the starting angle
-  let startAngle = -Math.PI / 2; // Start from the top (12 o'clock position)
-
-  // Draw each slice of the pie chart
-  for (const obj of data) {
-    const sliceAngle = (obj.time / total) * 2 * Math.PI;
-
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, canvas.height / 2); // Center of the canvas
-    ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 3, startAngle, startAngle + sliceAngle);
-    ctx.fillStyle = obj.color; // Set the color from the data object
-    ctx.fill();
-
-    // Update the starting angle for the next slice
-    startAngle += sliceAngle;
-
-  }
-}
-
 document.getElementById('timeLimitForm').addEventListener('submit', function (e) {
   e.preventDefault();
   const websiteUrl = document.getElementById('websiteUrl').value;
   const timeLimit = parseInt(document.getElementById('timeLimit').value);
   let websiteData = JSON.parse(localStorage.getItem("websiteBlocker"));
 
-  // Ensure that websiteData is an array
-  if (websiteData===null) {
+  if (websiteData === null) {
     websiteData = [];
   }
   websiteData.push({ url: websiteUrl, time: timeLimit });
@@ -127,37 +104,29 @@ document.getElementById('timeLimitForm').addEventListener('submit', function (e)
   displayWebsiteBlocker();
 });
 
-function displayWebsiteBlocker(){
+function displayWebsiteBlocker() {
   const submittedList = document.querySelector('.submittedList');
-  submittedList.innerHTML = ''; // Clear previous content
-  
-  // Retrieve website blocker data from local storage
-  const websiteData = JSON.parse(localStorage.getItem("websiteBlocker")) || [];
+  submittedList.innerHTML = '';
 
-  // Iterate over the websiteData and create list items to display each entry
+  const websiteData = JSON.parse(localStorage.getItem("websiteBlocker")) || [];
   websiteData.forEach((item, index) => {
     const li = document.createElement('li');
-    li.setAttribute( 'class', 'd-flex justify-content-between p-1' );
+    li.setAttribute('class', 'd-flex justify-content-between p-1');
     li.textContent = `URL: ${item.url}, Time Limit: ${item.time} minutes`;
-    
-    // Create delete button
+
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete';
-    deleteButton.setAttribute('class','btn btn-warning')
+    deleteButton.setAttribute('class', 'btn btn-warning');
     deleteButton.addEventListener('click', () => {
-      // Remove item from websiteData array
       websiteData.splice(index, 1);
-      // Update local storage
-      
       localStorage.setItem('websiteBlocker', JSON.stringify(websiteData));
       displayWebsiteBlocker();
     });
 
-    // Append delete button to list item
     li.appendChild(deleteButton);
-    // Append list item to UL
     submittedList.appendChild(li);
   });
 }
 
 displayWebsiteBlocker();
+setInterval(refreshData, 1000);

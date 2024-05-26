@@ -1,0 +1,77 @@
+*{
+    box-sizing: border-box;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+h1 {
+    color: #333;
+}
+#dateForm {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+#dateInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #0056b3;
+}
+
+
+#keysDropdown {
+    width: 300px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    appearance: none; /* Remove default dropdown arrow */
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="none" stroke="%23000" stroke-width=".75" d="M2 0L0 2h4z"/></svg>') no-repeat right 10px center;
+    background-color: #fff;
+    background-size: 10px;
+  }
+
+  #keysDropdown:focus {
+    border-color: #66afe9;
+    outline: none;
+    box-shadow: 0 0 5px rgba(102, 175, 233, .6);
+  }
+
+  a:link, a:visited {
+    background-color: rgb(93, 212, 230);
+    color: white;
+    padding: 14px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 5px;
+
+  }
+  
+  a:hover, a:active {
+    background-color: rgb(148, 127, 223);
+    color:black;
+    border:1px solid black;
+    border-radius: 5px;
+  }

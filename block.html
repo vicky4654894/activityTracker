@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Blocked</title>
+    <link rel="stylesheet" href="block.css">
 </head>
 <body>
-    <div class="container m-4">
-        <h1 class="text-center block-site">The site is blocked</h1>
+    <div>
+        <div id="content">
+            <h1>Welcome to the Time-Limited Page</h1>
+            <p>This content will be available for a limited time.</p>
+        </div>
+        <div id="timeout-message">
+            <h1>Time Limit Exceeded</h1>
+            <p>Your session has expired. Please click on the tracker icon to remove the time limit.</p> 
+        </div>
     </div>
-    <script src="background.js"></script>
 </body>
 </html>

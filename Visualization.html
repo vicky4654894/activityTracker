@@ -1,0 +1,25 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <link rel="stylesheet" href="./Chart/styleVisualization.css">
+</head>
+<body style="min-width: 750px;">
+    <h1>
+        <a href="./popup.html">Back</a>
+        <a href="./dayWise.html">Day-Wise</a>
+        </h1>
+
+        <h2 id="todayDate">Date</h2>
+
+        <select id="keysDropdown">
+            <!-- <option value="">--Select a Date--</option> -->
+          </select>
+
+    <canvas id="myPieChart" style="width: 100%; max-width: 700px; pointer-events: none;"></canvas>
+    <canvas id="myBarChart" style="width: 100%; max-width: 700px; pointer-events: none;"></canvas>
+    <script src="./Chart/Chart.js"></script>
+    <script src="./Chart/Visualization.js"></script>
+</body>
+</html>
