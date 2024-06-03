@@ -33,14 +33,12 @@ function refreshData() {
     storedData.forEach(entry => {
       const listItem = document.createElement('li');
       const colorbox = document.createElement('span');
-      colorbox.style.width = "20px";
-      colorbox.style.height = "20px";
-      listItem.style.color="black";
 
       if (entry.domain == null) {
         entry.domain = "chrome";
       }
       listItem.textContent = `Domain: ${entry.domain}, Time: ${formatTime(entry.time)}`;
+      
       console.log(entry.time);
 
       colorbox.style.backgroundColor = entry.color;

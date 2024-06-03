@@ -22,6 +22,7 @@
 
 /* Style each activity item */
 #activityList li {
+
   margin: 5px;
   font-size: 15px;
   display: flex;
@@ -29,7 +30,6 @@
   align-items: center;
   border: 2px solid #e1d6d6;
   padding: 10px;
-  background-color: #fff;
   text-align: center;
 }
 
