@@ -1,7 +1,5 @@
 let isTrackingPaused = false;
 let activeTabId;
-let startTime = 0;
-let pausedTime = 0;
 let websiteBlocker = null;
 const generatedColors = new Set();
 setInterval(updateElapsedTime, 1000);
@@ -53,9 +51,6 @@ function websiteBlockerFunction() {
   chrome.tabs.update(activeTabId, { url: chrome.runtime.getURL('block.html') });
 }
 
-function pad(number) {
-  return (number < 10 ? '0' : '') + number;
-}
 
 function updateElapsedTime() {
   const dateKey = `data ${formatDate()}`;
@@ -77,7 +72,6 @@ function updateElapsedTime() {
             let blockDomainName = "";
             let blockDomainTime = null;
             const time = storedData[index].time / 1000;
-           // chrome.browserAction.setBadgeText({ text: 'grr' });
             if (websiteBlocker) {
               const remainderWebsite = JSON.parse(websiteBlocker);
               remainderWebsite.forEach((item) => {
